@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/egg734631/Backend_Server#readme",
   "dependencies": {
-    "nodemon": "^1.19.1",
-    "promise-mysql": "^4.1.0"
+    "promise-mysql": "^4.1.0",
+    "restify": "^8.4.0"
   }
 }
