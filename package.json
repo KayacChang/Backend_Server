@@ -1,0 +1,24 @@
+{
+  "name": "Backend_Server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/egg734631/Backend_Server.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/egg734631/Backend_Server/issues"
+  },
+  "homepage": "https://github.com/egg734631/Backend_Server#readme",
+  "dependencies": {
+    "nodemon": "^1.19.1",
+    "promise-mysql": "^4.1.0"
+  }
+}
