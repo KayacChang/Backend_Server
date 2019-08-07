@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
   "repository": {
     "type": "git",
@@ -18,7 +19,11 @@
   },
   "homepage": "https://github.com/egg734631/Backend_Server#readme",
   "dependencies": {
+    "moment": "^2.24.0",
     "promise-mysql": "^4.1.0",
     "restify": "^8.4.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.19.1"
   }
 }

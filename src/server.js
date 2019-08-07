@@ -1,21 +1,28 @@
 
 const restify = require('restify');
 
-// ================================
-const SERVER_PORT = 8080;
+function CORS( req, res, next ) {
+	const config = {
+		'Access-Control-Allow-Origin': '*' ,
+		'Access-Control-Allow-Headers': 'X-Requested-With' 
+	};
 
-// ================================
-const server = restify.createServer();
+	for ( const [ key, value ] of Object.entries( config ) ) 
+		res.header( key, value );
 
-// ================================
-server.listen( SERVER_PORT, onStart );
-
-// ================================
-function onStart() {
-	require('./api/hello')( server );
-
-	console.log(`${server.name} listening at ${server.url}`);
+	return next();
 }
 
 // ================================
-module.exports = server;
+function Server( { databases } ) {
+	const server = restify.createServer();
+
+	server.use(CORS);
+
+	require('./api/game')( { server, databases } );
+
+	return server;
+}
+
+// ================================
+module.exports = Server;
