@@ -19,6 +19,8 @@
   },
   "homepage": "https://github.com/egg734631/Backend_Server#readme",
   "dependencies": {
+    "bcrypt": "^3.0.6",
+    "better-sqlite3": "^5.4.2",
     "moment": "^2.24.0",
     "promise-mysql": "^4.1.0",
     "restify": "^8.4.0"

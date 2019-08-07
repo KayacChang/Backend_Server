@@ -2,7 +2,7 @@
 const moment = require('moment');
 
 // ==============================
-const { slice } = require('../util');
+const { slice } = require('../util/str');
 
 // ==============================
 const API = '/exchange/:game'

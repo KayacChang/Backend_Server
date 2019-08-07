@@ -1,5 +1,7 @@
 
+// ===================================
 const mysql = require('promise-mysql');
+const Sqlite = require('better-sqlite3');
 
 // ===================================
 const bindSQL = require('./sql');
@@ -22,7 +24,7 @@ const DB_CONFIG = {
 };
 
 // ===================================
-async function DataBase( config ) {
+async function Game_DB( config ) {
 	const connect = await mysql.createPool( config );
 
 	bindSQL( connect );
@@ -49,11 +51,20 @@ function Error({ code }) {
 
 // ===================================
 async function DataBases() {
+	// Databases for Game ( ReadOnly )
 	const databases = {};
 
 	for (const [name, config] of Object.entries( DB_CONFIG )) {
-		databases[ name ] = await DataBase( { ...config, ...DB_USER } );
+		databases[ name ] = await Game_DB( { ...config, ...DB_USER } );
+
+		console.log(`Database [ ${ name } ] connected...`);
 	}
+
+	// Database for User Service
+	databases.user =
+		new Sqlite('user.db', { verbose: console.log } );
+
+	console.log(`Sqlite [ user.db ] connected...`);
 
 	return databases;
 }
