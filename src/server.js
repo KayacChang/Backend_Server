@@ -28,6 +28,9 @@ function Server( { databases } ) {
 	// History Service
 	require('./api/history')( { server, databases } );
 
+	// Exchange Service
+	require('./api/exchange')( { server, databases } );
+
 	return server;
 }
 
