@@ -1,7 +1,7 @@
 
 // ======================================
-const Record = require('./model/record');
-const Order = require('./model/order');
+const Record = require('../model/record');
+const Order = require('../model/order');
 
 // ======================================
 const SCHEMA = {

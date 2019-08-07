@@ -22,14 +22,20 @@ function Server( { databases } ) {
 	// For Query String
 	server.use( restify.plugins.queryParser() );
 
+	// For POST
+	server.use( restify.plugins.bodyParser() );
+
 	// For CORS
-	server.use(CORS);
+	server.use( CORS );
 
 	// History Service
 	require('./api/history')( { server, databases } );
 
 	// Exchange Service
 	require('./api/exchange')( { server, databases } );
+
+	// User Service
+	require('./api/user')( { server, databases } );
 
 	return server;
 }

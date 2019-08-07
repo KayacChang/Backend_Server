@@ -4,7 +4,7 @@ const mysql = require('promise-mysql');
 const Sqlite = require('better-sqlite3');
 
 // ===================================
-const bindSQL = require('./sql');
+const bindSQL = require('./sql/mysql');
 
 // ===================================
 const DB_USER = {
@@ -13,6 +13,7 @@ const DB_USER = {
 };
 
 const DB_CONFIG = {
+	// GAME Database
 	'alien': {
 		host: 'alien-stg.ulgplay.com',
 		port: 3306,
@@ -20,7 +21,12 @@ const DB_CONFIG = {
 	'catpunch': {
 		host: 'catpunch-stg.ulgplay.com',
 		port: 3306,
-	}
+	},
+
+	// CMS Database
+	'user': {
+		path: 'db/user.db',
+	},
 };
 
 // ===================================
@@ -49,22 +55,29 @@ function Error({ code }) {
 	);
 }
 
+
+
+function CMS_DB( { path } ) {
+	const database =
+		new Sqlite( path, { verbose: console.log } );
+
+	return database;
+}
+
 // ===================================
 async function DataBases() {
-	// Databases for Game ( ReadOnly )
 	const databases = {};
 
 	for (const [name, config] of Object.entries( DB_CONFIG )) {
-		databases[ name ] = await Game_DB( { ...config, ...DB_USER } );
 
-		console.log(`Database [ ${ name } ] connected...`);
+		console.log(`Connect To Database [ ${ name } ] ...`);
+
+		databases[ name ] = 
+			( name === 'user' ) ? CMS_DB( { ...config, name } ) :
+				await Game_DB( { ...config, ...DB_USER } );
 	}
 
-	// Database for User Service
-	databases.user =
-		new Sqlite('user.db', { verbose: console.log } );
-
-	console.log(`Sqlite [ user.db ] connected...`);
+	console.log(`All Databases connected...`);
 
 	return databases;
 }
