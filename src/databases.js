@@ -5,12 +5,19 @@ const mysql = require('promise-mysql');
 const bindSQL = require('./sql');
 
 // ===================================
+const DB_USER = {
+		user: 'kayac',
+		password: 'kayac123'
+};
+
 const DB_CONFIG = {
+	'alien': {
+		host: 'alien-stg.ulgplay.com',
+		port: 3306,
+	},
 	'catpunch': {
 		host: 'catpunch-stg.ulgplay.com',
 		port: 3306,
-		user: 'kayac',
-		password: 'kayac123'
 	}
 };
 
@@ -45,7 +52,7 @@ async function DataBases() {
 	const databases = {};
 
 	for (const [name, config] of Object.entries( DB_CONFIG )) {
-		databases[ name ] = await DataBase( config );
+		databases[ name ] = await DataBase( { ...config, ...DB_USER } );
 	}
 
 	return databases;
