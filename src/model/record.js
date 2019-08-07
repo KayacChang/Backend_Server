@@ -4,17 +4,14 @@ function Round({ scores, plate }) {
 	return { scores, result: plate };
 }
 
-function Record( date, accounts, data ) {
+function Record( date, data ) {
 	const {
-		index, PlayerID, Time, Msg, IValue1, IValue2
+		index, Account, Time, Msg, IValue1, IValue2
 	} = data;
 
 	const uid = date + index;
 
-	const userID = 
-		accounts
-			.find( (account) => account['PlayerID'] === PlayerID )['Account']
-			.replace('ulg:', '');
+	const userID = Account.replace('ulg:', '');
 
 	const time = Time * 1000;
 

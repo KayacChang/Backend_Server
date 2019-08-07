@@ -1,6 +1,8 @@
 
+// ================================
 const restify = require('restify');
 
+// ================================
 function CORS( req, res, next ) {
 	const config = {
 		'Access-Control-Allow-Origin': '*' ,
@@ -17,9 +19,14 @@ function CORS( req, res, next ) {
 function Server( { databases } ) {
 	const server = restify.createServer();
 
+	// For Query String
+	server.use( restify.plugins.queryParser() );
+
+	// For CORS
 	server.use(CORS);
 
-	require('./api/game')( { server, databases } );
+	// History Service
+	require('./api/history')( { server, databases } );
 
 	return server;
 }
