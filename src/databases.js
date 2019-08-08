@@ -5,6 +5,7 @@ const Sqlite = require('better-sqlite3');
 
 // ===================================
 const bindSQL = require('./sql/mysql');
+const { bindUser } = require('./sql/sqlite');
 
 // ===================================
 const DB_USER = {
@@ -30,15 +31,6 @@ const DB_CONFIG = {
 };
 
 // ===================================
-async function Game_DB( config ) {
-	const connect = await mysql.createPool( config );
-
-	bindSQL( connect );
-
-	connect.getConnection( onceConnected );
-
-	return connect;
-}
 
 function onceConnected( err, connection ) {
 	if ( err ) return console.error( Error( err ) );
@@ -55,11 +47,20 @@ function Error({ code }) {
 	);
 }
 
+async function Game_DB( config ) {
+	const connect = await mysql.createPool( config );
 
+	bindSQL( connect );
+
+	connect.getConnection( onceConnected );
+
+	return connect;
+}
 
 function CMS_DB( { path } ) {
-	const database =
-		new Sqlite( path, { verbose: console.log } );
+	const database = new Sqlite( path );
+
+	bindUser( database );
 
 	return database;
 }
