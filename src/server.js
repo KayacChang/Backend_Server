@@ -1,19 +1,14 @@
 
 // ================================
 const restify = require('restify');
+const corsMiddleware = require('restify-cors-middleware');
 
 // ================================
-function CORS( req, res, next ) {
-	const config = {
-		'Access-Control-Allow-Origin': '*' ,
-		'Access-Control-Allow-Headers': 'X-Requested-With' 
-	};
-
-	for ( const [ key, value ] of Object.entries( config ) ) 
-		res.header( key, value );
-
-	return next();
-}
+const CORS = corsMiddleware({
+	origins: [ '*' ],
+	allowHeaders: [ 'Authorization' ],
+	exposeHeaders: [ 'Authorization' ]
+});
 
 // ================================
 function Server( { databases } ) {
@@ -26,7 +21,8 @@ function Server( { databases } ) {
 	server.use( restify.plugins.bodyParser() );
 
 	// For CORS
-	server.use( CORS );
+	server.pre( CORS.preflight );
+	server.use( CORS.actual );
 
 	// History Service
 	require('./api/history')( { server, databases } );

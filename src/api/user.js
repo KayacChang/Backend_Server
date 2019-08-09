@@ -7,6 +7,8 @@ const { hashPW, checkPW, Token } = require('../util/crypto');
 
 const { PUB_KEY } = require('../../config');
 
+const User = require('../model/user');
+
 // ==============================
 const API = '/users';
 
@@ -42,7 +44,7 @@ function main( { server, databases } ) {
         server.use( TokenAuth.unless({ path }) );
 
 	// Database for User
-	const database = databases.user;
+	const database = databases.cms;
 
 	server.post( `${ API }/:method`, onPost );
 
@@ -67,12 +69,12 @@ function main( { server, databases } ) {
 		
 		if ( existed ) return next ( Error.Conflict( req.body.email ) );
 
-		const email = req.body.email;
+		const user = User( req.body );
 
-		const password = await hashPW( req.body.password );
+		user.password = await hashPW( user.password );
 
-		const result = database.saveUser( { email, password } );
-
+		database.saveUser( user );
+		
 		res.send( 201 );
 
 		return next();

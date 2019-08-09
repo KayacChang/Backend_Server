@@ -25,8 +25,8 @@ const DB_CONFIG = {
 	},
 
 	// CMS Database
-	'user': {
-		path: 'db/user.db',
+	'cms': {
+		path: 'db/cms.db',
 	},
 };
 
@@ -74,7 +74,7 @@ async function DataBases() {
 		console.log(`Connect To Database [ ${ name } ] ...`);
 
 		databases[ name ] = 
-			( name === 'user' ) ? CMS_DB( { ...config, name } ) :
+			( name === 'cms' ) ? CMS_DB( { ...config, name } ) :
 				await Game_DB( { ...config, ...DB_USER } );
 	}
 
