@@ -119,6 +119,9 @@ async function searchOrderBy( ...conditions ) {
 		AND
 			${ MERGE_BY_PLAYER_ID }
 			${ CONDITIONS }
+		ORDER BY
+			\`index\`
+		DESC
 		`;
 
 	const results = await this.query( sql );

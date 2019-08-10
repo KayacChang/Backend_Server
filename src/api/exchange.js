@@ -38,11 +38,7 @@ function main( { server, databases } ) {
 				.unix();
 
 			conditions.push( `Time BETWEEN ${ target } AND ${ next }` );
-		} else {
-			const current = moment().unix();
-
-			conditions.push( `Time >= ${ current }` );
-		}
+		}	
 
                 if ( req.query.uid ) {
                         const index = req.query.uid;
