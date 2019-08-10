@@ -43,7 +43,6 @@ function main( { server, databases } ) {
 			.map( method => `${ API }/${ method }` );
         server.use( TokenAuth.unless({ path }) );
 
-	// Database for User
 	const database = databases.cms;
 
 	server.post( `${ API }/:method`, onPost );

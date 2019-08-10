@@ -33,6 +33,9 @@ function Server( { databases } ) {
 	// User Service
 	require('./api/user')( { server, databases } );
 
+	// Product Service
+	require('./api/product')( { server, databases } );
+
 	return server;
 }
 

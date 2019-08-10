@@ -16,6 +16,13 @@ const SQL_ADD_USER = `
 	VALUES
 		( ?, ?, ? )
 	`;
+
+const SQL_FIND_ALL_PRODUCT = `
+	SELECT
+		*
+	FROM
+		Product
+	`;
 // ======================================
 
 function saveUser( { name, email, password } ) {
@@ -33,10 +40,17 @@ function findUser( { email } ) {
 	return result && User( result );
 }
 
+function findProduct() {
+	return this
+		.prepare( SQL_FIND_ALL_PRODUCT )
+		.all();
+}
+
 function bindUser( it ) {
 	const module = {
 		saveUser,
 		findUser,
+		findProduct,
 	};
 
 	return Object.assign( it, module );
