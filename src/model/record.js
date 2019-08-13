@@ -1,44 +1,69 @@
+// ================================
+const moment = require('moment');
 
 // ================================
-function Round({ scores, plate }) {
-	return { scores, result: plate };
+function Round({scores, plate}) {
+    //  type: Number
+    scores = Number(scores);
+
+    //  type: Number[]
+    const result = plate.map(Number);
+
+    return {scores, result};
 }
 
-function Record( date, data ) {
-	const {
-		index, Account, Time, Msg, IValue1, IValue2
-	} = data;
+function Record(data) {
 
-	const uid = date + index;
+    const {
+        index, Account, Time, Msg, IValue1, IValue2, date
+    } = data;
 
-	const userID = Account.replace('ulg:', '');
+    //  type: String
+    const uid = date + index;
 
-	const time = Time * 1000;
+    //  type: String
+    const userID = Account.replace('ulg:', '');
 
-	const totalScores = Number( IValue1 );
+    //  type: Date
+    const time = moment.unix(Time).toDate();
 
-	const bet = Number( IValue2 );
+    //  type: Number
+    const totalScores = Number(IValue1);
 
-	const { normalresult, freegame } = JSON.parse( Msg );
+    //  type: Number
+    const bet = Number(IValue2);
 
-	const normalGame = Round( normalresult );
+    let {
+        normalresult, respin, freegame
+    } = JSON.parse(Msg);
 
-	const featureGame = 
-		(freegame) ? freegame.map( Round ) : [];
+    if (respin && !Array.isArray(respin)) respin = [respin];
 
-	return {
-		uid,
+    //  type: Round
+    const normalGame = Round(normalresult);
 
-		userID,
+    const featureGame = {
+        //  type: Round
+        respin: (respin) && respin.map(Round),
 
-		time,
+        //  type: Round[]
+        freegame: (freegame) && freegame.map(Round)
+    };
 
-		bet,
-		totalScores,
+    return {
+        uid,
 
-		normalGame,
-		featureGame,
-	};
+        userID,
+
+        date,
+        time,
+
+        bet,
+        totalScores,
+
+        normalGame,
+        featureGame,
+    };
 }
 
 module.exports = Record;

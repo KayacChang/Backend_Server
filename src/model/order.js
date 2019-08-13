@@ -1,40 +1,58 @@
+// ================================
+const moment = require('moment');
 
 // ================================
 
-function Order( data ) {
-	const {
-		index, Account, CheckOut, 
-		Time, CoinType, Amount, NewGameMoney, 
-		TotalBet, TotalWin
-	} = data;
+function Order(data) {
 
-	const id = index;
+    const {
+        index, Account, CheckOut,
+        Time, CoinType, Amount, NewGameMoney,
+        TotalBet, TotalWin
+    } = data;
 
-	const userID = Account.replace('ulg:', '');
+    //	Type: String
+    const id = String(index);
 
-	const state = CheckOut ? 'checkout' : 'exchange';
+    //	Type: String
+    const userID = Account.replace('ulg:', '');
 
-	const exchange = {
-		time:		Time * 1000,
-		currency:	CoinType,
-		amount:		Amount,
-		balance:	NewGameMoney,
-	};
+    //	Type: String
+    const state = CheckOut ? 'checkout' : 'exchange';
 
-	const checkout = {
-		totalBet:	TotalBet,
-		totalWin:	TotalWin,
-	};
+    const exchange = {
 
-	return {
-		id,
-		userID,
-		state,
+        //	Type: Date
+        time: moment.unix(Time).toDate(),
 
-		exchange,
+        //	Type: Number
+        currency: Number(CoinType),
 
-		checkout,
-	};
+        //	Type: Number
+        amount: Number(Amount),
+
+        //	Type: Number
+        balance: Number(NewGameMoney),
+    };
+
+    const checkout = {
+
+        //	Type: Number
+        totalBet: Number(TotalBet),
+
+        //	Type: Number
+        totalWin: Number(TotalWin),
+    };
+
+    return {
+        id,
+        userID,
+        state,
+
+        exchange,
+
+        checkout,
+    };
 }
 
 module.exports = Order;

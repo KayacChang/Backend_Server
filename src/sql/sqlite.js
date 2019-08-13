@@ -1,6 +1,7 @@
-
+// ======================================
 const User = require('../model/user');
 
+// ======================================
 const SQL_FIND_BY_EMAIL = `
 	SELECT
 		*
@@ -23,42 +24,41 @@ const SQL_FIND_ALL_PRODUCT = `
 	FROM
 		Product
 	`;
+
 // ======================================
 
-function saveUser( { name, email, password } ) {
-	return this
-		.prepare( SQL_ADD_USER )
-		.run( name, email, password );
+function saveUser({name, email, password}) {
+    return this
+        .prepare(SQL_ADD_USER)
+        .run(name, email, password);
 }
 
-function findUser( { email } ) {
-	const result = 
-		this
-		.prepare( SQL_FIND_BY_EMAIL )
-		.get( email );
+function findUser({email}) {
+    const result =
+        this
+            .prepare(SQL_FIND_BY_EMAIL)
+            .get(email);
 
-	return result && User( result );
+    return result && User(result);
 }
 
 function findProduct() {
-	return this
-		.prepare( SQL_FIND_ALL_PRODUCT )
-		.all();
+    return this
+        .prepare(SQL_FIND_ALL_PRODUCT)
+        .all();
 }
 
-function bindUser( it ) {
-	const module = {
-		saveUser,
-		findUser,
-		findProduct,
-	};
+function bindSQL(it) {
+    const module = {
+        saveUser,
+        findUser,
+        findProduct,
+    };
 
-	return Object.assign( it, module );
+    return Object.assign(it, module);
 }
 
 // ======================================
 
-module.exports = {
-	bindUser,
-};
+module.exports = bindSQL;
 

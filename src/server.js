@@ -1,42 +1,41 @@
-
 // ================================
 const restify = require('restify');
 const corsMiddleware = require('restify-cors-middleware');
 
 // ================================
 const CORS = corsMiddleware({
-	origins: [ '*' ],
-	allowHeaders: [ 'Authorization' ],
-	exposeHeaders: [ 'Authorization' ]
+    origins: ['*'],
+    allowHeaders: ['Authorization'],
+    exposeHeaders: ['Authorization']
 });
 
 // ================================
-function Server( { databases } ) {
-	const server = restify.createServer();
+function Server({databases}) {
+    const server = restify.createServer();
 
-	// For Query String
-	server.use( restify.plugins.queryParser() );
+    // For Query String
+    server.use(restify.plugins.queryParser());
 
-	// For POST
-	server.use( restify.plugins.bodyParser() );
+    // For POST
+    server.use(restify.plugins.bodyParser());
 
-	// For CORS
-	server.pre( CORS.preflight );
-	server.use( CORS.actual );
+    // For CORS
+    server.pre(CORS.preflight);
+    server.use(CORS.actual);
 
-	// History Service
-	require('./api/history')( { server, databases } );
+    // History Service
+    require('./api/history')({server, databases});
 
-	// Exchange Service
-	require('./api/exchange')( { server, databases } );
+    // Exchange Service
+    require('./api/exchange')({server, databases});
 
-	// User Service
-	require('./api/user')( { server, databases } );
+    // User Service
+    require('./api/user')({server, databases});
 
-	// Product Service
-	require('./api/product')( { server, databases } );
+    // Product Service
+    require('./api/product')({server, databases});
 
-	return server;
+    return server;
 }
 
 // ================================

@@ -6,7 +6,7 @@ const moment = require('moment');
 const { slice } = require('../util/str');
 
 // ==============================
-const API = '/history/:game'
+const API = '/history/:game/:date'
 
 // ==============================
 
@@ -26,23 +26,9 @@ function main( { server, databases } ) {
 	async function getHistory( req, res, next ) {
 		const database = getDatabase( req );
 
-		const date = 
-			req.query.date || moment().format('YYYYMMDD');
+		const date = req.params.date; 
 
 		const conditions = [];
-
-		if ( req.query.uid ) {
-			const index = 
-				req.query.uid.replace( date, '' );
-
-			conditions.push( '`index` = ' + index );
-		}
-
-		if ( req.query.userID ) {
-			const account = 'ulg:' + req.query.userID;
-
-			conditions.push( `account.Account = '${ account }'` );
-		}
 
 		const history =
 			await database.searchHistoryBy( date, ...conditions );
