@@ -10,6 +10,10 @@ const ADMIN = {
     password: 'kayac123'
 };
 
+const DOMAIN = {
+    path: 'db/domain.db'
+};
+
 const GAME = {
     'alien': {
         host: 'alien-stg.ulgplay.com',
@@ -26,12 +30,7 @@ const GAME = {
 };
 
 const CMS = {
-    'catpunch': {
-        path: `mongodb+srv://${ADMIN.user}:${ADMIN.password}@cluster0-ug0nb.gcp.mongodb.net/catpunch?retryWrites=true&w=majority`,
-    },
-    'alien': {
-        path: `mongodb+srv://${ADMIN.user}:${ADMIN.password}@cluster0-ug0nb.gcp.mongodb.net/alien?retryWrites=true&w=majority`,
-    },
+    path: `mongodb+srv://${ADMIN.user}:${ADMIN.password}@cluster0-ug0nb.gcp.mongodb.net/catpunch?retryWrites=true&w=majority`,
 };
 
 
@@ -41,6 +40,6 @@ module.exports = {
     PUB_KEY: env.PUB_KEY || fs.readFileSync(path.resolve('config/jwtRS256.key.pub')),
 
     DB: {
-        GAME, CMS
+        DOMAIN, GAME, CMS
     },
 };

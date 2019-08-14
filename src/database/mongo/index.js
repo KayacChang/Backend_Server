@@ -16,7 +16,7 @@ async function Mongo({path}) {
     try {
         const db = await mongoose.connect(path, config);
 
-        return db;
+        return db.connection;
     } catch (err) {
         console.error(err);
     }

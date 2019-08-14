@@ -1,19 +1,29 @@
 // ===================================
 
-const {DB_USER, DB_CONFIG} = require('../../config');
+const Sqlite = require('better-sqlite3');
+
+const {DB} = require('../../config');
+
+const MySQL = require('./mysql');
+const Mongo = require('./mongo');
 
 // ===================================
-async function Index() {
+async function Databases() {
     const databases = {};
 
-    for (const [name, config] of Object.entries(DB_CONFIG)) {
+    databases.domain = new Sqlite(DB.DOMAIN.path);
 
-        console.log(`Connect To Database [ ${name} ] ...`);
+    const gameDBTasks =
+        Object.entries(DB.GAME)
+            .map(async ([name, config]) => {
+                console.log(`Connect To Game DB [ ${name} ] ...`);
 
-        databases[name] =
-            (name === 'cms') ? CMS_DB({...config, name}) :
-                await Game_DB({...config, ...DB_USER});
-    }
+                databases[name] = await MySQL(config);
+            });
+
+    await Promise.all(gameDBTasks);
+
+    databases.cms = await Mongo(DB.CMS);
 
     console.log(`All Databases connected...`);
 
@@ -21,4 +31,4 @@ async function Index() {
 }
 
 // ===================================
-module.exports = Index;
+module.exports = Databases;

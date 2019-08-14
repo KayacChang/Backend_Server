@@ -1,99 +1,103 @@
-
 // ==============================
 const errors = require('restify-errors');
 const jwt = require('restify-jwt-community');
 
-const { hashPW, checkPW, Token } = require('../util/crypto');
+// ==============================
+const {hashPW, checkPW, Token} = require('../util/crypto');
 
-const { PUB_KEY } = require('../../config');
+const {PUB_KEY} = require('../../config');
 
 const User = require('../model/user');
+
+const findUser = require('../database/sqlite/findUser');
+const saveUser = require('../database/sqlite/saveUser');
 
 // ==============================
 const API = '/users';
 
-const Error = { 
-	NotSupport: ( method ) => new errors.MethodNotAllowedError(
-		`Not Support: ${ method }`
-	),
-	Auth: () => new errors.UnauthorizedError( 
-		`Authentication Failed.` 
-	),
-	Conflict: ( email ) => new errors.ConflictError(
-		`User: [${ email }] already existed.` 
-	),
+const Error = {
+    NotSupport: (method) => new errors.MethodNotAllowedError(
+        `Not Support: ${method}`
+    ),
+    Auth: () => new errors.UnauthorizedError(
+        `Authentication Failed.`
+    ),
+    Conflict: (email) => new errors.ConflictError(
+        `User: [${email}] already existed.`
+    ),
 };
 
 const TokenAuth = jwt({
-	secret: PUB_KEY,
-	getToken: req => req.headers.authorization,
+    secret: PUB_KEY,
+    getToken: req => req.headers.authorization,
 });
 
 // ==============================
 
-function main( { server, databases } ) {
-	const services = {
-		register,
-		auth,
-	};
+function main({server, databases}) {
 
-	// For JWT Token Authentication
-	const path = 
-		Object.keys( services )
-			.map( method => `${ API }/${ method }` );
-        server.use( TokenAuth.unless({ path }) );
+    const services = {
+        register,
+        auth,
+    };
 
-	const database = databases.cms;
+    // For JWT Token Authentication
+    const path =
+        Object.keys(services)
+            .map(method => `${API}/${method}`);
+    server.use(TokenAuth.unless({path}));
 
-	server.post( `${ API }/:method`, onPost );
+    const database = databases.domain;
 
-	console.log(`API [ ${ API } ] get ready.`);
+    server.post(`${API}/:method`, onPost);
 
-	// ==============================
-	function onPost( req, res, next ) {
-		const { method } = req.params;
+    console.log(`API [ ${API} ] get ready.`);
 
-		const operation = { 
-			register,
-			auth,
-		}[ method ];
+    // ==============================
+    function onPost(req, res, next) {
+        const {method} = req.params;
 
-		if ( !operation ) return next( Error.NotSupport( method ) );
+        const operation = {
+            register,
+            auth,
+        }[method];
 
-		return operation( req, res, next );
-	}
+        if (!operation) return next(Error.NotSupport(method));
 
-	async function register( req, res, next ) {
-		const existed = database.findUser( req.body );
-		
-		if ( existed ) return next ( Error.Conflict( req.body.email ) );
+        return operation(req, res, next);
+    }
 
-		const user = User( req.body );
+    async function register(req, res, next) {
+        const existed = findUser(database, req.body);
 
-		user.password = await hashPW( user.password );
+        if (existed) return next(Error.Conflict(req.body.email));
 
-		database.saveUser( user );
-		
-		res.send( 201 );
+        const user = User(req.body);
 
-		return next();
-	}
+        user.password = await hashPW(user.password);
 
-	async function auth( req, res, next ) {
-		const user = database.findUser( req.body );
+        saveUser(database, user);
 
-		if ( !user ) return next( Error.Auth() );
+        res.send(201);
 
-		const matched = await checkPW( req.body.password, user.password );
+        return next();
+    }
 
-		if ( !matched ) return next( Error.Auth() );
+    async function auth(req, res, next) {
+        const user = findUser(database, req.body);
 
-		const token = Token( user, { expiresIn: '1d' } );
+        if (!user) return next(Error.Auth());
 
-		res.send( token );
+        const matched = await checkPW(req.body.password, user.password);
 
-		return next();
-	}
+        if (!matched) return next(Error.Auth());
+
+        const token = Token(user, {expiresIn: '1d'});
+
+        res.send(token);
+
+        return next();
+    }
 }
 
 // ==============================

@@ -44,10 +44,10 @@ function Record(data) {
 
     const featureGame = {
         //  type: Round
-        respin: (respin) && respin.map(Round),
+        reSpin: (respin) && respin.map(Round),
 
         //  type: Round[]
-        freegame: (freegame) && freegame.map(Round)
+        freeGame: (freegame) && freegame.map(Round)
     };
 
     return {

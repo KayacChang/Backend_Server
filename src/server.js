@@ -27,7 +27,7 @@ function Server({databases}) {
     require('./api/history')({server, databases});
 
     // Exchange Service
-    require('./api/exchange')({server, databases});
+    // require('./api/exchange')({server, databases});
 
     // User Service
     require('./api/user')({server, databases});

@@ -1,6 +1,6 @@
 // ================================
-// const DataBases = require('./src/databases');
-// const Server = require('./src/server');
+const Server = require('./src/server');
+const DataBases = require('./src/database');
 
 const {fork} = require('child_process');
 const path = require('path');
@@ -40,21 +40,17 @@ async function backGroundTask(target) {
 }
 
 async function main() {
-    // const databases = await DataBases();
-    //
-    // const server = Server({databases});
-    //
-    // server.listen(SERVER_PORT, onStart);
+    const databases = await DataBases();
 
-    // const ws = fs.createWriteStream('/log/out.txt');
+    const server = Server({databases});
 
-    ['catpunch', 'alien'].forEach(backGroundTask);
+    server.listen(SERVER_PORT, onStart);
 
-    // fork(taskPath, ['--target', 'alien']);
+    // ['catpunch', 'alien'].forEach(backGroundTask);
 
-    // function onStart() {
-    //     console.log(`${server.name} listening at ${server.url}`);
-    // }
+    function onStart() {
+        console.log(`${server.name} listening at ${server.url}`);
+    }
 }
 
 // ===================================

@@ -1,42 +1,71 @@
-
 // ==============================
 const moment = require('moment');
 
-// ==============================
-const { slice } = require('../util/str');
+const getHistoryFromGameDB = require('../database/mysql/func/getHistory');
+const getHistoryCountsFromGameDB = require('../database/mysql/func/getHistoryCounts');
+
+const Record = require('../database/mongo/model/record');
 
 // ==============================
-const API = '/history/:game/:date'
 
-// ==============================
+function main({server, databases}) {
 
-function main( { server, databases } ) {
+    // Get History
+    server.get('/history/:game/:date', getHistory);
+    console.log(`API [ /history ] get ready.`);
 
-	// Get History
-	server.get( API, getHistory );
+    server.get('/counts/:game', getHistoryCounts);
 
-	console.log(`API [ ${API} ] get ready.`);
+    // ==============================
 
-	// ==============================
+    function getDatabase(req) {
+        const game = req.params.game;
 
-	function getDatabase( req ) {
-		return databases[ req.params.game ];
-	}
+        databases.cms.useDb(game);
 
-	async function getHistory( req, res, next ) {
-		const database = getDatabase( req );
+        return databases[game];
+    }
 
-		const date = req.params.date; 
+    async function syncDBData(gameDB) {
+        const date = moment().format('YYYYMMDD');
 
-		const conditions = [];
+        const count = await Record.countDocuments({date});
+        const currentCount = await getHistoryCountsFromGameDB(gameDB, date);
 
-		const history =
-			await database.searchHistoryBy( date, ...conditions );
+        if (currentCount === count) return;
 
-		res.send( history );
+        const history = await getHistoryFromGameDB(gameDB, date);
+        await Record.deleteMany({date});
+        await Record.insertMany(history);
+    }
 
-		return next();
-	}
+    async function getHistoryCounts(req, res, next) {
+        const database = getDatabase(req);
+
+        await syncDBData(database);
+
+        const count = await Record.countDocuments({});
+
+        res.send({count});
+
+        return next();
+    }
+
+    async function getHistory(req, res, next) {
+        const database = getDatabase(req);
+
+        await syncDBData(database);
+
+        const date = req.params.date;
+
+        const history =
+            await Record.find({date}).sort({time: 'desc'});
+
+        res.send(history);
+
+        return next();
+
+    }
 }
 
 // ==============================

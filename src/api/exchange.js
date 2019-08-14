@@ -1,63 +1,60 @@
-
+// ==============================
 const moment = require('moment');
 
 // ==============================
-const { slice } = require('../util/str');
-
-// ==============================
-const API = '/exchange/:game'
+const API = '/exchange/:game';
 
 // ==============================
 
-function main( { server, databases } ) {
+function main({server, databases}) {
 
-	// Get Exchange
-	server.get( API, getExchange );
+    // Get Exchange
+    server.get(API, getExchange);
 
-	console.log(`API [ ${API} ] get ready.`);
+    console.log(`API [ ${API} ] get ready.`);
 
-	// ==============================
+    // ==============================
 
-	function getDatabase( req ) {
-		return databases[ req.params.game ];
-	}
+    function getDatabase(req) {
+        return databases[req.params.game];
+    }
 
-	async function getExchange( req, res, next ) {
-		const database = getDatabase( req );
+    async function getExchange(req, res, next) {
+        const database = getDatabase(req);
 
-		const conditions = [];
+        const conditions = [];
 
-		if ( req.query.date ) {
-			const target =
-				moment( req.query.date, 'YYYYMMDD' )
-				.unix();
+        if (req.query.date) {
+            const target =
+                moment(req.query.date, 'YYYYMMDD')
+                    .unix();
 
-			const next = 
-				moment( req.query.date, 'YYYYMMDD' )
-				.add( 1, 'd' )
-				.unix();
+            const next =
+                moment(req.query.date, 'YYYYMMDD')
+                    .add(1, 'd')
+                    .unix();
 
-			conditions.push( `Time BETWEEN ${ target } AND ${ next }` );
-		}	
+            conditions.push(`Time BETWEEN ${target} AND ${next}`);
+        }
 
-                if ( req.query.uid ) {
-                        const index = req.query.uid;
+        if (req.query.uid) {
+            const index = req.query.uid;
 
-                        conditions.push( '`index` = ' + index );
-                }
+            conditions.push('`index` = ' + index);
+        }
 
-                if ( req.query.userID ) {
-                        const account = 'ulg:' + req.query.userID;
+        if (req.query.userID) {
+            const account = 'ulg:' + req.query.userID;
 
-			conditions.push( `Account = '${ account }'` );
-		}
+            conditions.push(`Account = '${account}'`);
+        }
 
-		const orders = await database.searchOrderBy( ...conditions );
+        const orders = await database.searchOrderBy(...conditions);
 
-		res.send( orders );
+        res.send(orders);
 
-		return next();
-	}
+        return next();
+    }
 }
 
 // ==============================

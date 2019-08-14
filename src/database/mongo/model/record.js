@@ -59,8 +59,8 @@ const RecordSchema = new mongoose.Schema({
     normalGame: RoundSchema,
 
     featureGame: {
-        respin: [RoundSchema],
-        freegame: [RoundSchema]
+        reSpin: [RoundSchema],
+        freeGame: [RoundSchema]
     }
 });
 
