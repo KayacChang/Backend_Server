@@ -2,36 +2,49 @@
 const mongoose = require('mongoose');
 
 // ================================
-function Order(data) {
 
-    const exchange = {
-        //	Type: Date
-        time: moment.unix(Time).toDate(),
+const CheckoutSchema = new mongoose.Schema({
+    totalBet: {
+        type: Number,
 
-        //	Type: Number
-        currency: Number(CoinType),
+        required: true,
+        min: 0,
+    },
 
-        //	Type: Number
-        amount: Number(Amount),
+    totalWin: {
+        type: Number,
 
-        //	Type: Number
-        balance: Number(NewGameMoney),
-    };
-
-    const checkout = {
-
-        //	Type: Number
-        totalBet: Number(TotalBet),
-
-        //	Type: Number
-        totalWin: Number(TotalWin),
-    };
-
-
-}
+        required: true,
+        min: 0,
+    },
+});
 
 const ExchangeSchema = new mongoose.Schema({
-    
+    time: {
+        type: Date,
+
+        required: true,
+    },
+
+    currency: {
+        type: Number,
+
+        required: true,
+    },
+
+    amount: {
+        type: Number,
+
+        required: true,
+        min: 0,
+    },
+
+    balance: {
+        type: Number,
+
+        required: true,
+        min: 0,
+    },
 });
 
 const OrderSchema = new mongoose.Schema({
@@ -64,9 +77,9 @@ const OrderSchema = new mongoose.Schema({
         lowercase: true,
     },
 
-    exchange,
+    exchange: ExchangeSchema,
 
-    checkout,
+    checkout: CheckoutSchema,
 });
 
 // ================================

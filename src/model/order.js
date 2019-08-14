@@ -12,7 +12,7 @@ function Order(data) {
     } = data;
 
     //	Type: String
-    const id = String(index);
+    const uid = String(index);
 
     //	Type: String
     const userID = Account.replace('ulg:', '');
@@ -45,7 +45,7 @@ function Order(data) {
     };
 
     return {
-        id,
+        uid,
         userID,
         state,
 
