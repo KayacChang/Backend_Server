@@ -30,7 +30,12 @@ const GAME = {
 };
 
 const CMS = {
-    path: `mongodb+srv://${ADMIN.user}:${ADMIN.password}@cluster0-ug0nb.gcp.mongodb.net/catpunch?retryWrites=true&w=majority`,
+    'alien': {
+        path: `mongodb+srv://${ADMIN.user}:${ADMIN.password}@cluster0-ug0nb.gcp.mongodb.net/alien?retryWrites=true&w=majority`,
+    },
+    'catpunch': {
+        path: `mongodb+srv://${ADMIN.user}:${ADMIN.password}@cluster0-ug0nb.gcp.mongodb.net/catpunch?retryWrites=true&w=majority`,
+    },
 };
 
 

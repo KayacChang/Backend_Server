@@ -1,7 +1,7 @@
 
 // ===================================
 const findTable = require('../sql/findTable');
-const findHistoryCount = require('../sql/findHistoryCount');
+const findHistoryCounts = require('../sql/findHistoryCounts');
 
 // ===================================
 
@@ -12,7 +12,7 @@ async function getTableInfo(db) {
 
     const tasks =
         tableList.map(async (date) => {
-            const res = await db.query(findHistoryCount(date));
+            const res = await db.query(findHistoryCounts(date));
             const count = res[0]['count'];
 
             return {date, count};

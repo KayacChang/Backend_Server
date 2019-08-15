@@ -1,27 +1,33 @@
 // ==============================
 const moment = require('moment');
+const {isEmpty} = require('rambda');
 
 const getHistoryFromGameDB = require('../database/mysql/func/getHistory');
 const getHistoryCountsFromGameDB = require('../database/mysql/func/getHistoryCounts');
 
 const Record = require('../database/mongo/model/record');
 
+const Mongo = require('../database/mongo');
+const {DB} = require('../../config');
+
 // ==============================
 
 function main({server, databases}) {
 
-    // Get History
-    server.get('/history/:game/:date', getHistory);
-    console.log(`API [ /history ] get ready.`);
+    //  Get History
+    server.get('/history/:game', getHistoryByDate);
+    console.log(`API [ /history/:game ] get ready.`);
 
-    server.get('/counts/:game', getHistoryCounts);
+    //  Get History Counts
+    server.get('/history-counts/:game', getHistoryCounts);
+    console.log(`API [ /history-counts/:game ] get ready.`);
 
     // ==============================
 
-    function getDatabase(req) {
+    async function getDatabase(req) {
         const game = req.params.game;
 
-        databases.cms.useDb(game);
+        await Mongo(DB.CMS[game]);
 
         return databases[game];
     }
@@ -40,7 +46,7 @@ function main({server, databases}) {
     }
 
     async function getHistoryCounts(req, res, next) {
-        const database = getDatabase(req);
+        const database = await getDatabase(req);
 
         await syncDBData(database);
 
@@ -51,20 +57,26 @@ function main({server, databases}) {
         return next();
     }
 
-    async function getHistory(req, res, next) {
-        const database = getDatabase(req);
+    async function getHistoryByDate(req, res, next) {
+        const database = await getDatabase(req);
 
         await syncDBData(database);
 
-        const date = req.params.date;
+        if (isEmpty(req.query)) {
 
-        const history =
-            await Record.find({date}).sort({time: 'desc'});
+            const history =
+                await Record
+                    .find({})
+                    .sort({time: -1})
+                    .limit(100);
 
-        res.send(history);
+            res.send(history);
+
+            return next();
+        }
+
 
         return next();
-
     }
 }
 

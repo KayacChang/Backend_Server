@@ -1,5 +1,5 @@
 
-function findHistoryCount(date) {
+function findHistoryCounts(date) {
 
     return `
 SELECT
@@ -11,4 +11,4 @@ WHERE
 `;
 }
 
-module.exports = findHistoryCount;
+module.exports = findHistoryCounts;

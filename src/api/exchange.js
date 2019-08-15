@@ -1,55 +1,86 @@
 // ==============================
-const moment = require('moment');
+const {isEmpty} = require('rambda');
 
-// ==============================
-const API = '/exchange/:game';
+const getOrder = require('../database/mysql/func/getOrder');
+const getOrderCounts = require('../database/mysql/func/getOrderCounts');
+
+const Mongo = require('../database/mongo');
+const {DB} = require('../../config');
+
+const Order = require('../database/mongo/model/order');
 
 // ==============================
 
 function main({server, databases}) {
 
     // Get Exchange
-    server.get(API, getExchange);
+    server.get('/exchange/:game', getExchange);
+    console.log(`API [ /exchange/:game ] get ready.`);
 
-    console.log(`API [ ${API} ] get ready.`);
+    // Get Exchange
+    server.get('/exchange-counts/:game', getExchangeCounts);
+    console.log(`API [ /exchange-counts/:game ] get ready.`);
 
     // ==============================
 
-    function getDatabase(req) {
-        return databases[req.params.game];
+    async function getDatabase(req) {
+        const game = req.params.game;
+
+        await Mongo(DB.CMS[game]);
+
+        return databases[game];
+    }
+
+    async function syncDBData(gameDB) {
+
+        const count = await Order.countDocuments({});
+        const currentCount = await getOrderCounts(gameDB);
+
+        if (currentCount === count) return;
+
+        const orders = await getOrder(gameDB);
+
+        await Order.deleteMany({});
+        await Order.insertMany(orders);
+    }
+
+    async function getExchangeCounts(req, res, next) {
+        const database = await getDatabase(req);
+
+        await syncDBData(database);
+
+        const count = await Order.countDocuments({});
+
+        res.send({count});
+
+        return next();
     }
 
     async function getExchange(req, res, next) {
-        const database = getDatabase(req);
+        const database = await getDatabase(req);
 
-        const conditions = [];
+        await syncDBData(database);
 
-        if (req.query.date) {
-            const target =
-                moment(req.query.date, 'YYYYMMDD')
-                    .unix();
+        if (isEmpty(req.query)) {
 
-            const next =
-                moment(req.query.date, 'YYYYMMDD')
-                    .add(1, 'd')
-                    .unix();
+            const orders =
+                await Order
+                    .find()
+                    .sort({time: -1})
+                    .limit(100);
 
-            conditions.push(`Time BETWEEN ${target} AND ${next}`);
+            res.send(orders);
+
+            return next();
         }
 
-        if (req.query.uid) {
-            const index = req.query.uid;
+        const {from, to} = req.query;
 
-            conditions.push('`index` = ' + index);
-        }
-
-        if (req.query.userID) {
-            const account = 'ulg:' + req.query.userID;
-
-            conditions.push(`Account = '${account}'`);
-        }
-
-        const orders = await database.searchOrderBy(...conditions);
+        const orders =
+            await Order
+                .find()
+                .where('uid').gt(from).lt(to)
+                .sort({time: -1});
 
         res.send(orders);
 

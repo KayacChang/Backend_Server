@@ -5,7 +5,6 @@ const Sqlite = require('better-sqlite3');
 const {DB} = require('../../config');
 
 const MySQL = require('./mysql');
-const Mongo = require('./mongo');
 
 // ===================================
 async function Databases() {
@@ -22,8 +21,6 @@ async function Databases() {
             });
 
     await Promise.all(gameDBTasks);
-
-    databases.cms = await Mongo(DB.CMS);
 
     console.log(`All Databases connected...`);
 
