@@ -73,7 +73,10 @@ async function saveOrderTask(db) {
     else if (currentCount === batches.length)
         return console.log(`Skip Save Order, Equal Row Counts.`);
 
-    await execute(async () => Model_Order.insertMany(batches));
+    await execute(async () => {
+        await Model_Order.deleteMany({});
+        await Model_Order.insertMany(batches)
+    });
 
     console.log(`Orders Count: ${batches.length} Save Success!`);
 }

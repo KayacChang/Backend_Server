@@ -51,9 +51,12 @@ async function backGroundTask(target) {
 
 async function main(tasks) {
 
+    let hasSync = false;
+
     //  Sync When Server start
     console.log(`Background Task Start at ${moment().format()}`);
     await Promise.all(tasks.map(backGroundTask));
+    hasSync = true;
     console.log(`Background Task Done at ${moment().format()}`);
 
     //  Daily sync
@@ -69,12 +72,14 @@ async function main(tasks) {
             moment()
                 .hour(15).minute(30).second(0);
 
-        if (currentTime.valueOf() >= targetTime.valueOf()) {
+        if (currentTime.valueOf() >= targetTime.valueOf() && !hasSync) {
             console.log(`Background Task Start at ${moment().format()}`);
             await Promise.all(tasks.map(backGroundTask));
+            hasSync = true;
             console.log(`Background Task Done at ${moment().format()}`);
 
             await wait(tomorrow.valueOf() - currentTime.valueOf());
+            hasSync = false;
         } else {
             const minute = 60 * 1000;
 

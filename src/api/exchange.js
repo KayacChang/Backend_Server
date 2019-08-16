@@ -26,9 +26,7 @@ function main({server, databases}) {
     async function getDatabase(req) {
         const game = req.params.game;
 
-        await Mongo(DB.CMS[game]);
-
-        return databases[game];
+        return databases.game[game];
     }
 
     async function syncDBData(gameDB) {

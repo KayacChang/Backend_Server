@@ -7,8 +7,6 @@ const config = {
     useCreateIndex: true,
     poolSize: 20,
 
-    socketTimeoutMS: 0,
-    keepAlive: true,
     reconnectTries: 30,
 };
 
