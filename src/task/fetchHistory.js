@@ -38,25 +38,44 @@ async function fetchHistory(req) {
 
     await syncDBData(gameDB);
 
-    let history = undefined;
-
     if (isEmpty(req.query)) {
-        history =
-            await Record.find()
-                .sort({time: -1})
-                .limit(100);
+        const history = await findLatest();
 
-    } else {
-        const {from, limit} = req.query;
-
-        history =
-            await Record.find()
-                .skip(Number(from))
-                .sort({time: -1})
-                .limit(Number(limit));
+        return process.send(history);
     }
 
-    process.send(history);
+    const {
+        uid,
+    } = req.query;
+
+    const history = await (
+        (uid) ? findByUID :
+            findByRange
+    )(req.query);
+
+    return process.send(history);
+}
+
+function findLatest() {
+    return Record.find()
+        .sort({time: -1})
+        .limit(100);
+}
+
+function findByUID({uid}) {
+    uid = Number(uid);
+
+    return Record.find({uid});
+}
+
+function findByRange({from, limit}) {
+    from = Number(from);
+    limit = Number(limit);
+
+    return Record.find()
+        .skip(from)
+        .sort({time: -1})
+        .limit(limit);
 }
 
 function main() {
