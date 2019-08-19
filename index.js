@@ -5,9 +5,15 @@ const DataBases = require('./src/database');
 const runBGTasks = require('./src/task');
 
 const findProducts = require('./src/database/sqlite/findProducts');
+const {log} = require('./src/util/str');
+
+require('dotenv').config();
 
 // ===================================
-const SERVER_PORT = 8080;
+const {
+    SERVER_NAME,
+    SERVER_PORT
+} = process.env;
 
 // ===================================
 
@@ -23,7 +29,7 @@ async function main() {
             .map(({name}) => name);
 
     function onStart() {
-        console.log(`${server.name} listening at ${server.url}`);
+        log(`${SERVER_NAME} listening at ${server.url}`);
 
         runBGTasks(products);
     }
