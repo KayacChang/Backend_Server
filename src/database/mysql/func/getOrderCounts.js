@@ -3,11 +3,11 @@ const findOrderCounts = require('../sql/findOrderCounts');
 
 // ===================================
 
-async function getHistoryCount(db, date) {
-    const result = await db.query(findOrderCounts(date));
+async function getOrderCounts(db) {
+    const result = await db.query(findOrderCounts());
 
     return result[0]['count'];
 }
 
 // ===================================
-module.exports = getHistoryCount;
+module.exports = getOrderCounts;

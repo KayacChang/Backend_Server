@@ -3,9 +3,9 @@ const moment = require('moment');
 
 const {isEmpty} = require('rambda');
 
-const Record = require('../database/mongo/model/record');
-const getHistoryCounts = require('../database/mysql/func/getHistoryCounts');
-const getHistory = require('../database/mysql/func/getHistory');
+const Order = require('../database/mongo/model/order');
+const getOrderCounts = require('../database/mysql/func/getOrderCounts');
+const getOrder = require('../database/mysql/func/getOrder');
 
 const MySQL = require('../database/mysql');
 const Mongo = require('../database/mongo');
@@ -15,19 +15,22 @@ const {DB} = require('../../config');
 // ===================================
 
 async function syncDBData(gameDB) {
-    const date = moment().format('YYYYMMDD');
 
-    const count = await Record.countDocuments({date});
-    const currentCount = await getHistoryCounts(gameDB, date);
+    const count = await Order.countDocuments({});
+    const currentCount = await getOrderCounts(gameDB);
 
     if (currentCount === count) return;
 
-    const history = await getHistory(gameDB, date);
-    await Record.deleteMany({date});
-    await Record.insertMany(history);
+    const order = await getOrder(gameDB);
+
+    const list = await Order.find().select('uid');
+
+    const targets = order.filter((row) => !list.includes(row.uid));
+
+    await Order.insertMany(targets);
 }
 
-async function fetchHistory(req) {
+async function fetchExchange(req) {
     const game = req.params.game;
 
     const [gameDB] =
@@ -58,7 +61,7 @@ async function fetchHistory(req) {
 }
 
 function findLatest() {
-    return Record.find()
+    return Order.find()
         .sort({time: -1})
         .limit(100);
 }
@@ -66,8 +69,7 @@ function findLatest() {
 function findByUID({uid}) {
     uid = String(uid);
 
-    return Record.find({uid})
-        .sort({time: -1});
+    return Order.find({uid});
 }
 
 function findByUserOrTime({userID, timeStart, timeEnd}) {
@@ -81,9 +83,9 @@ function findByUserOrTime({userID, timeStart, timeEnd}) {
 
     const filter = {};
     if (userID) filter.userID = userID;
-    if (!isEmpty(time)) filter.time = time;
+    if (!isEmpty(time)) filter['exchange.time']= time;
 
-    return Record.find(filter)
+    return Order.find(filter)
         .sort({time: -1});
 }
 
@@ -91,14 +93,14 @@ function findByRange({from, limit}) {
     from = Number(from);
     limit = Number(limit);
 
-    return Record.find()
+    return Order.find()
         .skip(from)
         .sort({time: -1})
         .limit(limit);
 }
 
 function main() {
-    process.on('message', fetchHistory);
+    process.on('message', fetchExchange);
 }
 
 main();

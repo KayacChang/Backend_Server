@@ -5,7 +5,7 @@ const {fork} = require('child_process');
 
 // ==============================
 
-function main({server, databases}) {
+function main({server}) {
 
     //  Get History
     server.get('/history/:game', getHistory);

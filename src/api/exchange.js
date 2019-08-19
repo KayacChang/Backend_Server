@@ -1,17 +1,10 @@
 // ==============================
-const {isEmpty} = require('rambda');
+const path = require('path');
 
-const getOrder = require('../database/mysql/func/getOrder');
-const getOrderCounts = require('../database/mysql/func/getOrderCounts');
-
-const Mongo = require('../database/mongo');
-const {DB} = require('../../config');
-
-const Order = require('../database/mongo/model/order');
-
+const {fork} = require('child_process');
 // ==============================
 
-function main({server, databases}) {
+function main({server}) {
 
     // Get Exchange
     server.get('/exchange/:game', getExchange);
@@ -23,66 +16,41 @@ function main({server, databases}) {
 
     // ==============================
 
-    async function getDatabase(req) {
-        const game = req.params.game;
-
-        return databases.game[game];
-    }
-
-    async function syncDBData(gameDB) {
-
-        const count = await Order.countDocuments({});
-        const currentCount = await getOrderCounts(gameDB);
-
-        if (currentCount === count) return;
-
-        const orders = await getOrder(gameDB);
-
-        await Order.deleteMany({});
-        await Order.insertMany(orders);
-    }
-
     async function getExchangeCounts(req, res, next) {
-        const database = await getDatabase(req);
+        const proxy = fork(
+            path.resolve('src/task/fetchExchangeCounts')
+        );
 
-        await syncDBData(database);
+        proxy.send({
+            params: req.params,
+        });
 
-        const count = await Order.countDocuments({});
+        proxy.on('message', (history) => {
+            res.send(history);
 
-        res.send({count});
+            proxy.kill();
 
-        return next();
+            return next();
+        });
     }
 
     async function getExchange(req, res, next) {
-        const database = await getDatabase(req);
+        const proxy = fork(
+            path.resolve('src/task/fetchExchange')
+        );
 
-        await syncDBData(database);
+        proxy.send({
+            params: req.params,
+            query: req.query,
+        });
 
-        if (isEmpty(req.query)) {
+        proxy.on('message', (history) => {
+            res.send(history);
 
-            const orders =
-                await Order
-                    .find()
-                    .sort({time: -1})
-                    .limit(100);
-
-            res.send(orders);
+            proxy.kill();
 
             return next();
-        }
-
-        const {from, to} = req.query;
-
-        const orders =
-            await Order
-                .find()
-                .where('uid').gt(from).lt(to)
-                .sort({time: -1});
-
-        res.send(orders);
-
-        return next();
+        });
     }
 }
 
