@@ -20,6 +20,7 @@ const {
     GAME_DB_ALIEN_PORT,
 
     CMS_DB_HOST,
+    CMS_DB_PORT,
 
     PRI_KEY,
     PUB_KEY,
@@ -53,10 +54,10 @@ const GAME = {
 
 const CMS = {
     'alien': {
-        path: `mongodb+srv://${ADMIN.user}:${ADMIN.password}@${CMS_DB_HOST}/alien?retryWrites=true&w=majority`,
+        path: `mongodb://${ADMIN.user}:${ADMIN.password}@${CMS_DB_HOST}:${CMS_DB_PORT}/alien?retryWrites=true&w=majority`,
     },
     'catpunch': {
-        path: `mongodb+srv://${ADMIN.user}:${ADMIN.password}@${CMS_DB_HOST}/catpunch?retryWrites=true&w=majority`,
+        path: `mongodb://${ADMIN.user}:${ADMIN.password}@${CMS_DB_HOST}:${CMS_DB_PORT}/catpunch?retryWrites=true&w=majority`,
     },
 };
 
